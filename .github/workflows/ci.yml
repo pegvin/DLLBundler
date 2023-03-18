@@ -11,21 +11,27 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        msystem: [ { name: MINGW64, arch: x86_64 }, { name: MINGW32, arch: i686 } ]
-        compiler: [ { cc: gcc, cxx: g++ }, { cc: clang, cxx: clang++ } ]
+        msystem:
+          - { sys: mingw64, env: w64-x86_64 }
+          - { sys: mingw32, env: w64-i686 }
+          - { sys: ucrt64,  env: ucrt-x86_64 }
+          - { sys: clang64, env: clang-x86_64 }
+        compiler:
+          - { cc: gcc, cxx: g++ }
+          - { cc: clang, cxx: clang++ }
     defaults:
       run:
         shell: msys2 {0}
     steps:
     - uses: msys2/setup-msys2@v2
       with:
-        msystem: ${{ matrix.msystem.name }}
+        msystem: ${{ matrix.msystem.sys }}
         release: true
         update: false
         path-type: strict
         install: >-
           base-devel git
-          mingw-w64-${{ matrix.msystem.arch }}-${{ matrix.compiler.cc }}
+          mingw-${{ matrix.msystem.env }}-${{ matrix.compiler.cc }}
 
     - uses: actions/checkout@v2
       with:
