@@ -18,8 +18,8 @@ jobs:
           - { sys: clang64, env: w64-clang-i686 }
           - { sys: ucrt64,  env: w64-ucrt-x86_64 }
         compiler:
-          - { cc: gcc, cxx: g++ }
-          - { cc: clang, cxx: clang++ }
+          - { cc: gcc.exe, cxx: g++.exe }
+          - { cc: clang.exe, cxx: clang++.exe }
     defaults:
       run:
         shell: msys2 {0}
