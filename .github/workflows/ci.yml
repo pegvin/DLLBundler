@@ -12,11 +12,14 @@ jobs:
     strategy:
       matrix:
         msystem:
-          - { sys: mingw64, env: w64-x86_64,       compiler: [ { cc: gcc, cxx: g++ }, { cc: clang, cxx: clang++ } ] }
-          - { sys: mingw32, env: w64-i686,         compiler: [ { cc: gcc, cxx: g++ }, { cc: clang, cxx: clang++ } ] }
-          - { sys: ucrt64,  env: w64-ucrt-x86_64,  compiler: [ { cc: gcc, cxx: g++ }, { cc: clang, cxx: clang++ } ] }
-          - { sys: clang64, env: w64-clang-x86_64, compiler: [ { cc: clang, cxx: clang++ } ] }
-          - { sys: clang64, env: w64-clang-i686,   compiler: [ { cc: clang, cxx: clang++ } ] }
+          - { sys: mingw64, env: w64-x86_64,       compiler: { cc: gcc,   cxx: g++     } }
+          - { sys: mingw64, env: w64-x86_64,       compiler: { cc: clang, cxx: clang++ } }
+          - { sys: mingw32, env: w64-i686,         compiler: { cc: gcc,   cxx: g++     } }
+          - { sys: mingw32, env: w64-i686,         compiler: { cc: clang, cxx: clang++ } }
+          - { sys: ucrt64,  env: w64-ucrt-x86_64,  compiler: { cc: gcc,   cxx: g++     } }
+          - { sys: ucrt64,  env: w64-ucrt-x86_64,  compiler: { cc: clang, cxx: clang++ } }
+          - { sys: clang64, env: w64-clang-x86_64, compiler: { cc: clang, cxx: clang++ } }
+          - { sys: clang64, env: w64-clang-i686,   compiler: { cc: clang, cxx: clang++ } }
     defaults:
       run:
         shell: msys2 {0}
