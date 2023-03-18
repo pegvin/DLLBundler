@@ -1,4 +1,4 @@
-name: Windows x86
+name: ci
 
 on:
   push:
@@ -12,18 +12,14 @@ jobs:
     strategy:
       matrix:
         msystem:
-          - { sys: mingw64, env: w64-x86_64 }
-          - { sys: mingw32, env: w64-i686 }
-          - { sys: clang64, env: w64-clang-x86_64 }
-          - { sys: clang64, env: w64-clang-i686 }
-          - { sys: ucrt64,  env: w64-ucrt-x86_64 }
-        compiler:
-          - { cc: gcc, cxx: g++ }
-          - { cc: clang, cxx: clang++ }
+          - { sys: mingw64, env: w64-x86_64,       compiler: [ { cc: gcc, cxx: g++ }, { cc: clang, cxx: clang++ } ] }
+          - { sys: mingw32, env: w64-i686,         compiler: [ { cc: gcc, cxx: g++ }, { cc: clang, cxx: clang++ } ] }
+          - { sys: ucrt64,  env: w64-ucrt-x86_64,  compiler: [ { cc: gcc, cxx: g++ }, { cc: clang, cxx: clang++ } ] }
+          - { sys: clang64, env: w64-clang-x86_64, compiler: [ { cc: clang, cxx: clang++ } ] }
+          - { sys: clang64, env: w64-clang-i686,   compiler: [ { cc: clang, cxx: clang++ } ] }
     defaults:
       run:
         shell: msys2 {0}
-    if: "contains(${{ matrix.msystem.sys }}, 'clang') && !contains(${{ matrix.compiler.cc }}, 'gcc')"
     steps:
     - uses: msys2/setup-msys2@v2
       with:
@@ -33,17 +29,17 @@ jobs:
         path-type: strict
         install: >-
           base-devel git
-          mingw-${{ matrix.msystem.env }}-${{ matrix.compiler.cc }}
+          mingw-${{ matrix.msystem.env }}-${{ matrix.msystem.compiler.cc }}
 
     - uses: actions/checkout@v2
       with:
         submodules: 'true'
 
     - name: make
-      run: make -j4 CC=${{ matrix.compiler.cc }}.exe CXX=${{ matrix.compiler.cxx }}.exe LN=${{ matrix.compiler.cxx }}.exe
+      run: make -j4 CC=${{ matrix.msystem.compiler.cc }} CXX=${{ matrix.msystem.compiler.cxx }} LN=${{ matrix.msystem.compiler.cxx }}
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: dllbundler-${{ matrix.msystem.sys }}-${{ matrix.msystem.env }}-${{ matrix.compiler.cxx }}
+        name: dllbundler-${{ matrix.msystem.sys }}-${{ matrix.msystem.env }}-${{ matrix.msystem.compiler.cxx }}
         path: dllbundler.exe
