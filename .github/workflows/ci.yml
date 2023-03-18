@@ -11,36 +11,31 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        msystem: [MINGW64, MINGW32]
-        arch: [x86_64, i686]
-        include:
-          - cc: gcc
-          - cxx: g++
-          - cc: clang
-          - cxx: clang++
+        msystem: [ { name: MINGW64, arch: x86_64 }, { name: MINGW32, arch: i686 } ]
+        compiler: [ { cc: gcc, cpp: g++ }, { cc: clang, cpp: clang++} ]
     defaults:
       run:
         shell: msys2 {0}
     steps:
     - uses: msys2/setup-msys2@v2
       with:
-        msystem: MINGW64
+        msystem: ${{ matrix.msystem.name }}
         release: true
         update: false
         path-type: strict
         install: >-
           base-devel git
-          mingw-w64-${{ matrix.arch }}-${{ matrix.cc }}
+          mingw-w64-${{ matrix.msystem.name }}-${{ matrix.compiler.cc }}
 
     - uses: actions/checkout@v2
       with:
         submodules: 'true'
 
     - name: make
-      run: make -j4 CC=${{ matrix.cc }} CXX=${{ matrix.cxx }} LN=${{ matrix.cxx }}
+      run: make -j4 CC=${{ matrix.compiler.cc }} CXX=${{ matrix.compiler.cc }} LN=${{ matrix.compiler.cc }}
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: dllbundler-${{ matrix.msystem }}-${{ matrix.arch }}-${{ matrix.cxx }}
+        name: dllbundler-${{ matrix.msystem.name }}-${{ matrix.msystem.arch }}-${{ matrix.compiler.cxx }}
         path: dllbundler.exe
