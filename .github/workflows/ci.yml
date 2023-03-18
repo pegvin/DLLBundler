@@ -25,7 +25,7 @@ jobs:
         path-type: strict
         install: >-
           base-devel git
-          mingw-w64-${{ matrix.msystem.name }}-${{ matrix.compiler.cc }}
+          mingw-w64-${{ matrix.msystem.arch }}-${{ matrix.compiler.cc }}
 
     - uses: actions/checkout@v2
       with:
