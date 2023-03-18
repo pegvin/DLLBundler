@@ -18,8 +18,8 @@ jobs:
           - { sys: clang64, env: w64-clang-i686 }
           - { sys: ucrt64,  env: w64-ucrt-x86_64 }
         compiler:
-          - { cc: gcc.exe, cxx: g++.exe }
-          - { cc: clang.exe, cxx: clang++.exe }
+          - { cc: gcc, cxx: g++ }
+          - { cc: clang, cxx: clang++ }
     defaults:
       run:
         shell: msys2 {0}
@@ -39,7 +39,7 @@ jobs:
         submodules: 'true'
 
     - name: make
-      run: make -j4 CC=${{ matrix.compiler.cc }} CXX=${{ matrix.compiler.cxx }} LN=${{ matrix.compiler.cxx }}
+      run: make -j4 CC=${{ matrix.compiler.cc }}.exe CXX=${{ matrix.compiler.cxx }}.exe LN=${{ matrix.compiler.cxx }}.exe
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
