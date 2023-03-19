@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
 			if (ExecuteShellCmd("upx --version 2>&1").substr(0, 3) != "upx") {
 				throw std::runtime_error("upx command failed!");
 			}
-		} catch (std::exception e) {
+		} catch (std::exception const& e) {
 			std::cout << "UPX compression disabled, failed to get UPX version!" << std::endl;
 			upx = false;
 		}
