@@ -39,7 +39,7 @@ jobs:
         submodules: 'true'
 
     - name: make
-      run: make -j4 CC=${{ matrix.msystem.compiler.cc }} CXX=${{ matrix.msystem.compiler.cxx }} LN=${{ matrix.msystem.compiler.cxx }}
+      run: make -j4 DEBUG=false CC=${{ matrix.msystem.compiler.cc }} CXX=${{ matrix.msystem.compiler.cxx }} LN=${{ matrix.msystem.compiler.cxx }}
 
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
