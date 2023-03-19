@@ -6,6 +6,7 @@ STRIP = strip
 FIND = find src -type f -name
 PKGCONFIG = pkg-config
 BIN = dllbundler.exe
+DEBUG = true
 
 FLAGS := -Isrc -Wall -MMD -MP
 C_FLAGS := --std=c99
@@ -16,7 +17,7 @@ OBJ = $(patsubst %,$(ODIR)/%.o,$(shell $(FIND) '*.cpp'))
 DEP := $(OBJ:.o=.d)
 
 ifeq ($(DEBUG),true)
-	FLAGS += -O0 -g -D_DEBUG
+	FLAGS += -O0 -g
 else
 	FLAGS += -O3
 endif
