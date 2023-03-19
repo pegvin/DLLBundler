@@ -16,9 +16,9 @@ namespace fs = std::filesystem;
 
 bool upx = false;
 bool copy = false;
-std::vector<std::string> searchDir;
-std::string executable = "";
-const std::vector<std::string> blacklist = {
+Vector<String> searchDir;
+String executable = "";
+const Vector<String> blacklist = {
 	"advapi32.dll", "kernel32.dll", "msvcrt.dll", "ole32.dll", "user32.dll",
 	"ws2_32.dll", "comdlg32.dll", "gdi32.dll", "imm32.dll", "oleaut32.dll",
 	"shell32.dll", "winmm.dll", "winspool.drv", "wldap32.dll",
@@ -31,10 +31,10 @@ const std::vector<std::string> blacklist = {
 	"d3d11.dll", "dxgi.dll", "dwrite.dll"
 };
 
-std::string FindDLLPath(std::string& dllName, std::vector<std::string>& searchDirectories) {
+String FindDLLPath(String& dllName, Vector<String>& searchDirectories) {
 	for (auto directory : searchDirectories) {
-		std::string dllPath = (fs::path(directory) / fs::path(dllName)).string();
-		std::string dllPathLower = (fs::path(directory) / fs::path(StringLowerCaseCopy(dllName))).string();
+		String dllPath = (fs::path(directory) / fs::path(dllName)).string();
+		String dllPathLower = (fs::path(directory) / fs::path(StringLowerCaseCopy(dllName))).string();
 		if (doesFileExist(dllPath)) {
 			std::cout << "Found: " << dllPath << std::endl;
 			return dllPath;
@@ -47,12 +47,12 @@ std::string FindDLLPath(std::string& dllName, std::vector<std::string>& searchDi
 	return "";
 }
 
-std::vector<std::string> GatherRequiredDLLs(std::string& binaryPath, std::vector<std::string>& foundDLLs) {
-	std::string output = ExecuteShellCmd(("objdump -p " + binaryPath + " | grep '\tDLL Name:' 2>&1").c_str());
+Vector<String> GatherRequiredDLLs(String& binaryPath, Vector<String>& foundDLLs) {
+	String output = ExecuteShellCmd(("objdump -p " + binaryPath + " | grep '\tDLL Name:' 2>&1").c_str());
 	auto requiredDLLs = StringSplit(output, "\tDLL Name: ");
 
 	// filter out if it exists in blacklist or foundDLLs
-	requiredDLLs.erase(std::remove_if(std::begin(requiredDLLs), std::end(requiredDLLs), [&](std::string& dll) {
+	requiredDLLs.erase(std::remove_if(std::begin(requiredDLLs), std::end(requiredDLLs), [&](String& dll) {
 		trim(dll);
 		if (dll.empty()) return true;
 		auto lowerDLL = StringLowerCaseCopy(dll);
@@ -63,20 +63,20 @@ std::vector<std::string> GatherRequiredDLLs(std::string& binaryPath, std::vector
 			if (dll == foundDLL) return true;
 		}
 
-		std::string dllPath = FindDLLPath(dll, searchDir);
+		String dllPath = FindDLLPath(dll, searchDir);
 		if (!dllPath.empty()) foundDLLs.emplace_back(dllPath);
+
+		auto subDLLs = GatherRequiredDLLs(dll, requiredDLLs);
+		if (subDLLs.size() > 0) {
+			requiredDLLs.insert(
+				requiredDLLs.end(),
+				std::make_move_iterator(subDLLs.begin()),
+				std::make_move_iterator(subDLLs.end())
+			);
+		}
 
 		return false;
 	}), std::end(requiredDLLs));
-
-	for (std::string& dll : requiredDLLs) {
-		auto subDLLs = GatherRequiredDLLs(dll, requiredDLLs);
-		requiredDLLs.insert(
-			requiredDLLs.end(),
-			std::make_move_iterator(subDLLs.begin()),
-			std::make_move_iterator(subDLLs.end())
-		);
-	}
 
 	return requiredDLLs;
 }
@@ -87,7 +87,7 @@ int main(int argc, char** argv) {
 	}
 
 	for (int i = 1; i < argc; ++i) {
-		std::string arg = argv[i];
+		String arg = argv[i];
 		if (arg == "-h" || arg == "--help") {
 			std::cout << HELP_MESSAGE << std::endl;
 			return 0;
@@ -139,11 +139,14 @@ int main(int argc, char** argv) {
 	}
 	std::cout << std::endl;
 
-	std::vector<std::string> ___tempVar;
-	auto dllsRequired = GatherRequiredDLLs(executable, ___tempVar);
+	Vector<String> dllsRequired;
+	{
+		Vector<String> __foundDLLs; // because GatherRequiredDLLs is a recursive function it passes the found dlls as reference to avoid duplicate entries but initially calling the function with empty vector works
+		dllsRequired = GatherRequiredDLLs(executable, __foundDLLs);
+	}
 
 	std::cout << "DLLs Required: \n";
-	for (std::string& dll : dllsRequired) {
+	for (String& dll : dllsRequired) {
 		std::cout << "  " << dll << '\n';
 	}
 	std::cout << std::endl;
