@@ -1,15 +1,12 @@
-CC = gcc
 CXX = g++
-OBJC = g++
 LN = g++
 STRIP = strip
 FIND = find src -type f -name
-PKGCONFIG = pkg-config
 BIN = dllbundler.exe
 DEBUG = true
+POSTBUILD =
 
 FLAGS := -Isrc -Wall -MMD -MP
-C_FLAGS := --std=c99
 CPP_FLAGS := --std=c++17
 LN_FLAGS :=
 ODIR = build
@@ -20,6 +17,7 @@ ifeq ($(DEBUG),true)
 	FLAGS += -O0 -g
 else
 	FLAGS += -O3
+	POSTBUILD = $(STRIP) $(BIN)
 endif
 
 $(ODIR)/%.cpp.o: %.cpp
@@ -30,6 +28,7 @@ $(ODIR)/%.cpp.o: %.cpp
 $(BIN): $(OBJ)
 	$(info Linking $@)
 	@$(LN) $^ -o $@ $(FLAGS) $(LN_FLAGS)
+	@$(POSTBUILD)
 
 .PHONY: clean
 
