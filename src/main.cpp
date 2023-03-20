@@ -6,7 +6,7 @@
 
 namespace fs = std::filesystem;
 
-#define HELP_MESSAGE "Usage: dllbundler [-h] [--copy] [--upx] executable\n\n" \
+#define HELP_MESSAGE "Usage: dllb [-h] [--copy] [--upx] executable\n\n" \
 "positional arguments:\n" \
 "  executable  EXE or DLL file to bundle dependencies for\n\n" \
 "options:\n" \
