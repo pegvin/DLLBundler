@@ -6,13 +6,13 @@
 
 namespace fs = std::filesystem;
 
-#define HELP_MESSAGE "Usage: dllbundler [-h] [--copy] [--upx] [--search-dir SEARCH_DIR] executable\n\n" \
+#define HELP_MESSAGE "Usage: dllbundler [-h] [--copy] [--upx] executable\n\n" \
 "positional arguments:\n" \
-"  executable     EXE or DLL file to bundle dependencies for\n\n" \
+"  executable  EXE or DLL file to bundle dependencies for\n\n" \
 "options:\n" \
-"  -h, --help     Show this help message and exit\n" \
-"  --copy         Copy the DLLs next to the executable\n" \
-"  --upx          Run UPX on all the DLLs and EXE (requires --copy)."
+"  -h, --help  Show this help message and exit\n" \
+"  --copy      Copy the DLLs next to the executable\n" \
+"  --upx       Run UPX on all the DLLs and EXE (requires --copy)."
 
 bool upx = false;
 bool copy = false;
