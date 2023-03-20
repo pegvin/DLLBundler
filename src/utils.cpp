@@ -29,12 +29,7 @@ void trim(std::string &s) {
 	ltrim(s);
 }
 
-std::string& StringLowerCaseRef(std::string& s) {
-	std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::tolower(c); });
-	return s;
-}
-
-std::string StringLowerCaseCopy(std::string& s) {
+String StringToLowerCase(String& s) {
 	auto newStr = s;
 	std::transform(newStr.begin(), newStr.end(), newStr.begin(), [](unsigned char c){ return std::tolower(c); });
 	return newStr;

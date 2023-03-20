@@ -34,7 +34,7 @@ const Vector<String> blacklist = {
 String FindDLLPath(String& dllName, Vector<String>& searchDirectories) {
 	for (auto directory : searchDirectories) {
 		String dllPath = (fs::path(directory) / fs::path(dllName)).string();
-		String dllPathLower = (fs::path(directory) / fs::path(StringLowerCaseCopy(dllName))).string();
+		String dllPathLower = (fs::path(directory) / fs::path(StringToLowerCase(dllName))).string();
 		if (PathIsFile(dllPath)) {
 			// std::cout << "Found: " << dllPath << std::endl;
 			return dllPath;
@@ -58,7 +58,7 @@ Vector<String> GatherRequiredDLLs(String& executable, Vector<String>& foundDLLs)
 		trim(dllName);
 		if (dllName.empty()) continue;
 
-		auto dllNameLower = StringLowerCaseCopy(dllName);
+		auto dllNameLower = StringToLowerCase(dllName);
 		if (
 			std::find(blacklist.begin(), blacklist.end(), dllNameLower) != blacklist.end() ||
 			std::find(foundDLLs.begin(), foundDLLs.end(), dllNameLower) != foundDLLs.end()

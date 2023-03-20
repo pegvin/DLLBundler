@@ -13,11 +13,8 @@ using Vector = std::vector<Type>;
 // trim from both ends (in place)
 void trim(String &s);
 
-// lower-cases the original string 's' & returns it
-String& StringLowerCaseRef(String& s);
-
 // lower-cases the COPY of the original string 's' & returns it
-String StringLowerCaseCopy(String& s);
+String StringToLowerCase(String& s);
 
 // Split "stringToSplit" By "delimiter" And Put Into A Vector, Return The Vector
 Vector<String> StringSplit(String stringToSplit, String delimiter);
