@@ -2,7 +2,7 @@ CXX = g++
 LN = g++
 STRIP = strip
 FIND = find src -type f -name
-BIN = dllbundler.exe
+BIN = dllb.exe
 DEBUG = true
 POSTBUILD =
 
