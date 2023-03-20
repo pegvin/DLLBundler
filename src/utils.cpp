@@ -6,8 +6,11 @@
 #include <algorithm> 
 #include <cctype>
 #include <locale>
+#include <filesystem>
 
 #include "utils.h"
+
+namespace fs = std::filesystem;
 
 static void ltrim(std::string &s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
@@ -37,22 +40,33 @@ std::string StringLowerCaseCopy(std::string& s) {
 	return newStr;
 }
 
-std::vector<std::string> StringSplit(std::string s, std::string delimiter) {
-	size_t pos = 0;
-	std::string token;
-	std::vector<std::string> arr;
-	while ((pos = s.find(delimiter)) != std::string::npos) {
-		token = s.substr(0, pos);
-		arr.emplace_back(token);
-		s.erase(0, pos + delimiter.length());
+Vector<String> StringSplit(String str, String token){
+	Vector<String> result;
+	while (str.size()) {
+		String::size_type index = str.find(token);
+		if (index != String::npos){
+			result.push_back(str.substr(0, index));
+			str = str.substr(index + token.size());
+			if (str.size() == 0) result.push_back(str);
+		} else{
+			result.push_back(str);
+			break;
+		}
 	}
-	return arr;
+	return result;
 }
 
-bool doesFileExist(std::string& path) {
-	int res = access(path.c_str(), R_OK);
-	if (res < 0) return false;
-	return true;
+bool PathExists(String& path) {
+	return fs::exists(fs::path(path));
+}
+
+bool PathExists(fs::path& path) {
+	return fs::exists(path);
+}
+
+bool PathIsFile(String& _path) {
+	auto path = fs::path(_path);
+	return PathExists(path) && (!fs::is_directory(path));
 }
 
 std::string ExecuteShellCmd(const char* cmd) {
@@ -67,5 +81,4 @@ std::string ExecuteShellCmd(const char* cmd) {
 	}
 	return result;
 }
-
 
