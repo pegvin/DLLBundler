@@ -1,10 +1,11 @@
-# DLLBundler
+# DLLB - DLL Bundler
+
 Recursively Copy DLLs Required By A .exe or a .dll file.
 
 ---
 # Usage
 ```
-Usage: dllbundler [-h] [--copy] [--upx] executable
+Usage: dllb [-h] [--copy] [--upx] executable
 
 positional arguments:
   executable  EXE or DLL file to bundle dependencies for
