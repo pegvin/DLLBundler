@@ -22,8 +22,11 @@ String StringLowerCaseCopy(String& s);
 // Split "stringToSplit" By "delimiter" And Put Into A Vector, Return The Vector
 Vector<String> StringSplit(String stringToSplit, String delimiter);
 
+// checks if a "path" exists
+bool PathExists(String& path);
+
 // checks if a file at "path" exists
-bool doesFileExist(String& path);
+bool PathIsFile(String& path);
 
 // executes a command and returns the stdout
 String ExecuteShellCmd(const char* cmd);
