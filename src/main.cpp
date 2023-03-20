@@ -35,11 +35,11 @@ String FindDLLPath(String& dllName, Vector<String>& searchDirectories) {
 	for (auto directory : searchDirectories) {
 		String dllPath = (fs::path(directory) / fs::path(dllName)).string();
 		String dllPathLower = (fs::path(directory) / fs::path(StringLowerCaseCopy(dllName))).string();
-		if (doesFileExist(dllPath)) {
-			std::cout << "Found: " << dllPath << std::endl;
+		if (PathIsFile(dllPath)) {
+			// std::cout << "Found: " << dllPath << std::endl;
 			return dllPath;
-		} else if (dllPath != dllPathLower && doesFileExist(dllPathLower)) {
-			std::cout << "Found: " << dllPathLower << std::endl;
+		} else if (dllPath != dllPathLower && PathIsFile(dllPathLower)) {
+			// std::cout << "Found: " << dllPathLower << std::endl;
 			return dllPathLower;
 		}
 	}
@@ -47,38 +47,38 @@ String FindDLLPath(String& dllName, Vector<String>& searchDirectories) {
 	return "";
 }
 
-Vector<String> GatherRequiredDLLs(String& binaryPath, Vector<String>& foundDLLs) {
-	String output = ExecuteShellCmd(("objdump -p " + binaryPath + " | grep '\tDLL Name:' 2>&1").c_str());
-	auto requiredDLLs = StringSplit(output, "\tDLL Name: ");
+Vector<String> GatherRequiredDLLs(String& executable, Vector<String>& foundDLLs) {
+	if (executable.empty() || !PathIsFile(executable)) { return {}; }
 
-	// filter out if it exists in blacklist or foundDLLs
-	requiredDLLs.erase(std::remove_if(std::begin(requiredDLLs), std::end(requiredDLLs), [&](String& dll) {
-		trim(dll);
-		if (dll.empty()) return true;
-		auto lowerDLL = StringLowerCaseCopy(dll);
-		for (auto blacklistDLL : blacklist) {
-			if (lowerDLL == blacklistDLL) return true;
+	Vector<String> ret = { executable };
+	String output = ExecuteShellCmd(("objdump -p " + executable + " 2>&1 | grep '\tDLL Name:' 2>&1").c_str());
+	Vector<String> dlls = StringSplit(output, "\tDLL Name: ");
+
+	for (auto dllName : dlls) {
+		trim(dllName);
+		if (dllName.empty()) continue;
+
+		auto dllNameLower = StringLowerCaseCopy(dllName);
+		if (
+			std::find(blacklist.begin(), blacklist.end(), dllNameLower) != blacklist.end() ||
+			std::find(foundDLLs.begin(), foundDLLs.end(), dllNameLower) != foundDLLs.end()
+		) continue;
+
+		auto dllPath = FindDLLPath(dllName, searchDir);
+		if (!dllPath.empty()) {
+			foundDLLs.push_back(dllNameLower);
+			auto subDLLs = GatherRequiredDLLs(dllPath, foundDLLs);
+			if (!subDLLs.empty()) {
+				ret.insert(
+					ret.end(),
+					std::make_move_iterator(subDLLs.begin()),
+					std::make_move_iterator(subDLLs.end())
+				);
+			}
 		}
-		for (auto foundDLL : foundDLLs) {
-			if (dll == foundDLL) return true;
-		}
+	}
 
-		String dllPath = FindDLLPath(dll, searchDir);
-		if (!dllPath.empty()) foundDLLs.emplace_back(dllPath);
-
-		auto subDLLs = GatherRequiredDLLs(dll, requiredDLLs);
-		if (subDLLs.size() > 0) {
-			requiredDLLs.insert(
-				requiredDLLs.end(),
-				std::make_move_iterator(subDLLs.begin()),
-				std::make_move_iterator(subDLLs.end())
-			);
-		}
-
-		return false;
-	}), std::end(requiredDLLs));
-
-	return requiredDLLs;
+	return ret;
 }
 
 int main(int argc, char** argv) {
@@ -145,12 +145,14 @@ int main(int argc, char** argv) {
 		dllsRequired = GatherRequiredDLLs(executable, __foundDLLs);
 	}
 
-	std::cout << "DLLs Required: \n";
+	std::cout << "Found DLLs: \n";
 	for (String& dll : dllsRequired) {
-		std::cout << "  " << dll << '\n';
+		std::cout << " - " << dll << '\n';
+		if (copy) {
+			ExecuteShellCmd(("cp -f " + dll + " " + fs::path(executable).parent_path().string()).c_str());
+		}
 	}
 	std::cout << std::endl;
 
 	return 0;
 }
-
