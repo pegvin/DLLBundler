@@ -32,7 +32,7 @@ options:
 ## Notes
 
 - dllb uses directories listed in `$PATH` env variable to search for the required DLLs.
-- overwriding `$PATH` variable is useful if you want to add more search paths.
+- overriding `$PATH` variable is useful if you want to add more search paths.
 
 ---
 ## License
