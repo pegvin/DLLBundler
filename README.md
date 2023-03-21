@@ -44,7 +44,9 @@ options:
 
 1. Clone The Repo: `git clone https://github.com/pegvin/DLLBundler`
 2. CD into the cloned repo: `cd DLLBundler/`
-3. Build: `make all DEBUG=false` (`DEBUG` is set to true by default)
+3. Build: `make all DEBUG=false CXX=g++ LN=g++`
+   - `DEBUG` is set to true by default
+   - `CXX` & `LN` are set to g++ by default but can be overriden if using clang++
 
 ---
 ## License
